@@ -77,4 +77,6 @@ build-iPhoneSimulator/
 .history
 .ionide
 
+.[Ee]nv
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,ruby
