@@ -1,0 +1,22 @@
+services:
+    lms-service-db:
+        image: mysql:8.0
+        ports:
+            - "${DB_PORT}:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - ./db/mysql:/var/lib/mysql
+        networks:
+            - lms-service-net
+volumes:
+    db_data:
+        driver: local
+
+networks:
+    lms-service-net:
+    backend-net:
+        external: true
