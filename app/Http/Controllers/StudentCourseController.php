@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\StudentCourse;
+use Illuminate\Support\Facades\Validator;
 
 class StudentCourseController extends Controller
 {
@@ -23,11 +24,19 @@ class StudentCourseController extends Controller
         $query->where('isActive', true);
         $studentCourses = $query->paginate($pageSize, ['*'], 'page', $pageNumber);
 
+        $totalPages = $studentCourses->lastPage();
+        if ($pageNumber > $totalPages) {
+            return response()->json([
+                'message' => 'Page number exceeds total pages',
+                'status' => 400
+            ], 400);
+        }
         return response()->json([
             'data' => $studentCourses->items(),
             'total' => $studentCourses->total(),
             'current_page' => $studentCourses->currentPage(),
             'per_page' => $studentCourses->perPage(),
+            'total_pages' => $totalPages,
             'status' => 200
         ], 200);
     }
@@ -104,24 +113,26 @@ class StudentCourseController extends Controller
 
     public function store(Request $request)
     {
-        $validateData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'courseId' => 'required|uuid',
             'studentId' => 'required|uuid',
             'tenantId' => 'nullable|uuid',
         ]);
-        if (!$validateData) {
+        if ($validator->fails()) {
             $data = [
                 'message' => 'Invalid data provided',
+                'errors' => $validator->errors(),
                 'status' => 422
             ];
             return response()->json($data, 422);
         }
+        $validateData = $validator->validated();
 
-        $query = StudentCourse::where('courseId', $request->courseId)
-            ->where('studentId', $request->studentId);
+        $query = StudentCourse::where('courseId', $validateData['courseId'])
+            ->where('studentId', $validateData['studentId']);
 
-        if ($request->filled('tenantId')) {
-            $query->where('tenantId', $request->tenantId);
+        if (isset($validateData['tenantId'])) {
+            $query->where('tenantId', $validateData['tenantId']);
         }
 
         $studentCourse = $query->first();
