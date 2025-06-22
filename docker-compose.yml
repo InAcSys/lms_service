@@ -1,0 +1,46 @@
+services:
+
+  lms-service:
+    image: lms-service:latest
+    restart: always
+    build: .
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: lms-service-db
+    ports:
+      - "${LMS_SERVICE_PORT}:8000"
+    depends_on:
+      - lms-service-db
+    volumes:
+      - .:/app
+    networks:
+      - lms-service-net
+      - backend-net
+
+  lms-service-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+    ports:
+      - "5442:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - lms-service-net
+
+volumes:
+  postgres-data:
+
+
+networks:
+  lms-service-net:
+  backend-net:
+    external: true
