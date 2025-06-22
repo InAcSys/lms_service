@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SubjectStudentController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 const TASK_ID_ROUTE = '/{id}';
@@ -13,9 +14,15 @@ Route::prefix('subject-students')->group(function () {
 });
 
 Route::prefix('tasks')->group(function () {
-    Route::get('/', [App\Http\Controllers\TaskController::class, 'index']);
-    Route::get(TASK_ID_ROUTE, [App\Http\Controllers\TaskController::class, 'show']);
-    Route::post('/', [App\Http\Controllers\TaskController::class, 'store']);
-    Route::put(TASK_ID_ROUTE, [App\Http\Controllers\TaskController::class, 'update']);
-    Route::delete(TASK_ID_ROUTE, [App\Http\Controllers\TaskController::class, 'destroy']);
+    Route::get('/', [TaskController::class, 'index']);
+    Route::get(TASK_ID_ROUTE, [TaskController::class, 'show']);
+    Route::post('/', [TaskController::class, 'store']);
+    Route::put(TASK_ID_ROUTE, [TaskController::class, 'update']);
+    Route::delete(TASK_ID_ROUTE, [TaskController::class, 'destroy']);
+    Route::prefix('submitted')->group(function () {
+        Route::get('/task/{id}', [TaskController::class, 'getSubmittedTask']);
+        Route::get('/tasks/{id}', [TaskController::class, 'showSubmittedTasks']);
+        Route::post('/{id}', [TaskController::class, 'submitResolution']);
+    });
+    Route::prefix('grades')->group(function () {});
 });

@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\SubmittedTask;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
     const QUERY_PARAMS_MISSING = 'Required query parameters are missing. Please provide tenantId and subjectId.';
+    const QUERY_PARAMS_MISSING_2 = 'Required query parameters are missing. Please provide tenantId and studentId.';
+    const QUERY_PARAMS_MISSING_3 = 'Required query parameter is missing. Please provide tenantId.';
     const TASK_NOT_FOUND_ERROR = 'Task not found or does not belong to the specified tenant or subject.';
 
     public function index(Request $request)
@@ -175,6 +178,102 @@ class TaskController extends Controller
 
         return response()->json([
             'message' => 'Task deleted successfully.',
+            'status' => 200
+        ], 200);
+    }
+
+    public function getSubmittedTask(Request $request, $id)
+    {
+        $tenantId = $request->query('tenantId');
+        $studentId = $request->query('studentId');
+
+        if (!$tenantId || !$studentId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING_2
+            ], 400);
+        }
+
+        $submittedTask = SubmittedTask::where('TaskId', $id)
+            ->where('StudentId', $studentId)
+            ->where('TenantId', $tenantId)
+            ->where('IsActive', true)
+            ->first();
+
+        if (!$submittedTask) {
+            return response()->json([
+                'message' => 'No submitted task found for the given parameters.',
+                'status' => 404
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $submittedTask,
+            'message' => 'Submitted task retrieved successfully.',
+            'status' => 200
+        ], 200);
+    }
+
+    public function showSubmittedTasks($id, Request $request)
+    {
+        $tenantId = $request->query('tenantId');
+
+        if (!$tenantId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING_3
+            ], 400);
+        }
+
+        $submittedTasks = SubmittedTask::where('TaskId', $id)
+            ->where('TenantId', $tenantId)
+            ->where('IsActive', true)
+            ->get();
+
+        return response()->json([
+            'data' => $submittedTasks,
+            'message' => 'Submitted tasks retrieved successfully.',
+            'status' => 200
+        ], 200);
+    }
+
+    public function submitResolution(Request $request, $id)
+    {
+        $tenantId = $request->query('tenantId');
+        $studentId = $request->query('studentId');
+
+        if (!$tenantId || !$studentId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING_2
+            ], 400);
+        }
+
+        $task = Task::find($id);
+
+        if (!$task || $task->TenantId !== $tenantId) {
+            return response()->json([
+                'error' => self::TASK_NOT_FOUND_ERROR
+            ], 404);
+        }
+
+        $contents = $request->input('Content', []);
+
+        if (!is_array($contents) || count($contents) > 10) {
+            return response()->json([
+                'message' => 'Content must be an array with a maximum of 10 items.'
+            ], 422);
+        }
+
+        $submittedTask = SubmittedTask::create([
+            'Content' => json_encode($contents),
+            'TaskId' => $id,
+            'StudentId' => $studentId,
+            'TenantId' => $tenantId,
+            'IsActive' => true,
+            'Created' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Task resolution sent successfully.',
+            'data' => $submittedTask,
             'status' => 200
         ], 200);
     }
