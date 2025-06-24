@@ -24,5 +24,9 @@ Route::prefix('tasks')->group(function () {
         Route::get('/tasks/{id}', [TaskController::class, 'showSubmittedTasks']);
         Route::post('/{id}', [TaskController::class, 'submitResolution']);
     });
-    Route::prefix('grades')->group(function () {});
+    Route::prefix('grades')->group(function () {
+        Route::get('/', [TaskController::class, 'getStudentGradesBySubject']);
+        Route::get('/task/{id}', [TaskController::class, 'getStudentGradeByTask']);
+        Route::post('/assign/{id}', [TaskController::class, 'assignGrade']);
+    });
 });

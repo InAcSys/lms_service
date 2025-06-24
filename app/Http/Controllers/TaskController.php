@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\SubmittedTask;
+use App\Models\Grade;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
@@ -12,6 +13,7 @@ class TaskController extends Controller
     const QUERY_PARAMS_MISSING = 'Required query parameters are missing. Please provide tenantId and subjectId.';
     const QUERY_PARAMS_MISSING_2 = 'Required query parameters are missing. Please provide tenantId and studentId.';
     const QUERY_PARAMS_MISSING_3 = 'Required query parameter is missing. Please provide tenantId.';
+    const QUERY_PARAMS_MISSING_4 = 'Required query parameters are missing. Please provide subjectId, tenantId and studentId.';
     const TASK_NOT_FOUND_ERROR = 'Task not found or does not belong to the specified tenant or subject.';
 
     public function index(Request $request)
@@ -276,5 +278,133 @@ class TaskController extends Controller
             'data' => $submittedTask,
             'status' => 200
         ], 200);
+    }
+
+    public function getStudentGradesBySubject(Request $request)
+    {
+        $tenantId = $request->query('tenantId');
+        $studentId = $request->query('studentId');
+        $subjectId = $request->query('subjectId');
+
+        if (!$tenantId || !$studentId || !$subjectId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING
+            ], 400);
+        }
+
+        $grades = Grade::where('TenantId', $tenantId)
+            ->where('StudentId', $studentId)
+            ->where('SubjectId', $subjectId)
+            ->where('IsActive', true)
+            ->get();
+
+        $data = [
+            'grades' => $grades,
+            'average' => $grades->avg('Grade'),
+            'highest' => $grades->max('Grade'),
+            'lowest' => $grades->min('Grade')
+        ];
+
+        return response()->json([
+            'data' => $data,
+            'message' => 'Grades retrieved successfully.',
+            'status' => 200
+        ], 200);
+    }
+
+    public function getStudentGradeByTask(Request $request, $id)
+    {
+        $tenantId = $request->query('tenantId');
+        $studentId = $request->query('studentId');
+
+        if (!$tenantId || !$studentId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING_2
+            ], 400);
+        }
+
+        $grade = Grade::where('TenantId', $tenantId)
+            ->where('StudentId', $studentId)
+            ->where('TaskId', $id)
+            ->where('IsActive', true)
+            ->first();
+
+        if (!$grade) {
+            return response()->json([
+                'message' => 'No grade found for the given task.',
+                'status' => 404
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $grade,
+            'message' => 'Grade retrieved successfully.',
+            'status' => 200
+        ], 200);
+    }
+
+    public function assignGrade(Request $request, $id)
+    {
+        $tenantId = $request->query('tenantId');
+        $studentId = $request->query('studentId');
+        $subjectId = $request->query('subjectId');
+
+        $task = Task::find($id);
+
+        if (!$task) {
+            return response()->json(
+                [
+                    'message' => 'Task not found',
+                    'status' => 404
+                ],
+                404
+            );
+        }
+
+        if (!$tenantId || !$studentId || !$subjectId) {
+            return response()->json(
+                [
+                    'message' => self::QUERY_PARAMS_MISSING_4,
+                    'status' => 400
+                ],
+                400
+            );
+        }
+
+        $validator = Validator::make($request->all(), [
+            'Grade' => 'required|numeric|decimal:0,2|min:0|max:100',
+            'Comment' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'message' => 'Invalid request',
+                    'errors' => $validator->errors(),
+                    'status' => 400
+                ],
+                400
+            );
+        }
+
+        $grade = Grade::create([
+            'TenantId' => $tenantId,
+            'StudentId' => $studentId,
+            'SubjectId' => $subjectId,
+            'TaskId' => $id,
+            'Grade' => $request->input('Grade'),
+            'Comment' => $request->input('Comment'),
+            'IsActive' => true,
+            'Created' => now(),
+        ]);
+
+        return response()->json(
+            [
+                'data' => $grade,
+                'message' => 'Grade assigned successfully',
+                'status' => 201
+            ],
+            201
+        );
     }
 }
