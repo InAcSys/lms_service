@@ -7,24 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 class SubjectStudent extends Model
 {
     protected $table = 'subject_students';
-
-    protected $primaryKey = 'Id';
-
+    
     public $timestamps = false;
 
     protected $fillable = [
-        'SubjectId',
-        'StudentId',
-        'TenantId',
-        'IsActive',
-        'Created',
-        'Updated',
-        'Deleted',
+        'subjectId',
+        'studentId',
+        'tenantId',
+        'isActive',
+        'created',
+        'updated',
+        'deleted',
     ];
 
     protected $casts = [
-        'Created' => 'datetime',
-        'Updated' => 'datetime',
-        'Deleted' => 'datetime',
+        'created' => 'datetime',
+        'updated' => 'datetime',
+        'deleted' => 'datetime',
     ];
 }

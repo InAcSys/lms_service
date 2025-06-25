@@ -27,9 +27,9 @@ class TaskController extends Controller
             ], 400);
         }
 
-        $tasks = Task::where('TenantId', $tenantId)
-            ->where('SubjectId', $subjectId)
-            ->where('IsActive', true)
+        $tasks = Task::where('tenantId', $tenantId)
+            ->where('subjectId', $subjectId)
+            ->where('isActive', true)
             ->get();
 
         return response()->json([
@@ -50,10 +50,10 @@ class TaskController extends Controller
             ], 400);
         }
 
-        $task = Task::where('Id', $id)
-            ->where('TenantId', $tenantId)
-            ->where('SubjectId', $subjectId)
-            ->where('IsActive', true)
+        $task = Task::where('id', $id)
+            ->where('tenantId', $tenantId)
+            ->where('subjectId', $subjectId)
+            ->where('isActive', true)
             ->first();
 
         if (!$task) {
@@ -81,8 +81,8 @@ class TaskController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'Title' => 'required|string|max:255',
-            'Description' => 'nullable|string',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -93,13 +93,13 @@ class TaskController extends Controller
         }
 
         $task = Task::create([
-            'Title' => $request->input('Title'),
-            'Description' => $request->input('Description'),
-            'DueDate' => $request->input('DueDate') ? now()->parse($request->input('DueDate')) : now() + '1 day',
-            'SubjectId' => $subjectId,
-            'TenantId' => $tenantId,
-            'IsActive' => true,
-            'Created' => now(),
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'dueDate' => $request->input('dueDate') ? now()->parse($request->input('dueDate')) : now() + '1 day',
+            'subjectId' => $subjectId,
+            'tenantId' => $tenantId,
+            'isActive' => true,
+            'created' => now(),
         ]);
 
         return response()->json([
@@ -121,16 +121,16 @@ class TaskController extends Controller
         }
 
         $task = Task::find($id);
-        if (!$task || $task->TenantId !== $tenantId || $task->SubjectId !== $subjectId) {
+        if (!$task || $task->tenantId !== $tenantId || $task->subjectId !== $subjectId) {
             return response()->json([
                 'error' => self::TASK_NOT_FOUND_ERROR
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'Title' => 'required|string|max:255',
-            'Description' => 'nullable|string',
-            'DueDate' => 'nullable|date',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'dueDate' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
@@ -140,12 +140,12 @@ class TaskController extends Controller
             ], 422);
         }
 
-        $task->Title = $request->input('Title');
-        $task->Description = $request->input('Description');
-        if ($request->has('DueDate')) {
-            $task->DueDate = now()->parse($request->input('DueDate'));
+        $task->title = $request->input('title');
+        $task->description = $request->input('description');
+        if ($request->has('dueDate')) {
+            $task->dueDate = now()->parse($request->input('dueDate'));
         }
-        $task->Updated = now();
+        $task->updated = now();
         $task->save();
 
         return response()->json([
@@ -168,14 +168,14 @@ class TaskController extends Controller
 
         $task = Task::find($id);
 
-        if (!$task || $task->TenantId !== $tenantId || $task->SubjectId !== $subjectId) {
+        if (!$task || $task->tenantId !== $tenantId || $task->subjectId !== $subjectId) {
             return response()->json([
                 'error' => 'Task not found or does not belong to the specified tenant or subject.'
             ], 404);
         }
 
-        $task->IsActive = false;
-        $task->Deleted = now();
+        $task->isActive = false;
+        $task->deleted = now();
         $task->save();
 
         return response()->json([
@@ -195,10 +195,10 @@ class TaskController extends Controller
             ], 400);
         }
 
-        $submittedTask = SubmittedTask::where('TaskId', $id)
-            ->where('StudentId', $studentId)
-            ->where('TenantId', $tenantId)
-            ->where('IsActive', true)
+        $submittedTask = SubmittedTask::where('taskId', $id)
+            ->where('studentId', $studentId)
+            ->where('tenantId', $tenantId)
+            ->where('isActive', true)
             ->first();
 
         if (!$submittedTask) {
@@ -225,9 +225,9 @@ class TaskController extends Controller
             ], 400);
         }
 
-        $submittedTasks = SubmittedTask::where('TaskId', $id)
-            ->where('TenantId', $tenantId)
-            ->where('IsActive', true)
+        $submittedTasks = SubmittedTask::where('taskId', $id)
+            ->where('tenantId', $tenantId)
+            ->where('isActive', true)
             ->get();
 
         return response()->json([
@@ -250,13 +250,13 @@ class TaskController extends Controller
 
         $task = Task::find($id);
 
-        if (!$task || $task->TenantId !== $tenantId) {
+        if (!$task || $task->tenantId !== $tenantId) {
             return response()->json([
                 'error' => self::TASK_NOT_FOUND_ERROR
             ], 404);
         }
 
-        $contents = $request->input('Content', []);
+        $contents = $request->input('content', []);
 
         if (!is_array($contents) || count($contents) > 10) {
             return response()->json([
@@ -265,12 +265,12 @@ class TaskController extends Controller
         }
 
         $submittedTask = SubmittedTask::create([
-            'Content' => json_encode($contents),
-            'TaskId' => $id,
-            'StudentId' => $studentId,
-            'TenantId' => $tenantId,
-            'IsActive' => true,
-            'Created' => now(),
+            'content' => json_encode($contents),
+            'taskId' => $id,
+            'studentId' => $studentId,
+            'tenantId' => $tenantId,
+            'isActive' => true,
+            'created' => now(),
         ]);
 
         return response()->json([
@@ -292,17 +292,17 @@ class TaskController extends Controller
             ], 400);
         }
 
-        $grades = Grade::where('TenantId', $tenantId)
-            ->where('StudentId', $studentId)
-            ->where('SubjectId', $subjectId)
-            ->where('IsActive', true)
+        $grades = Grade::where('tenantId', $tenantId)
+            ->where('studentId', $studentId)
+            ->where('subjectId', $subjectId)
+            ->where('isActive', true)
             ->get();
 
         $data = [
             'grades' => $grades,
-            'average' => $grades->avg('Grade'),
-            'highest' => $grades->max('Grade'),
-            'lowest' => $grades->min('Grade')
+            'average' => $grades->avg('grade'),
+            'highest' => $grades->max('grade'),
+            'lowest' => $grades->min('grade')
         ];
 
         return response()->json([
@@ -323,10 +323,10 @@ class TaskController extends Controller
             ], 400);
         }
 
-        $grade = Grade::where('TenantId', $tenantId)
-            ->where('StudentId', $studentId)
-            ->where('TaskId', $id)
-            ->where('IsActive', true)
+        $grade = Grade::where('tenantId', $tenantId)
+            ->where('studentId', $studentId)
+            ->where('taskId', $id)
+            ->where('isActive', true)
             ->first();
 
         if (!$grade) {
@@ -372,8 +372,8 @@ class TaskController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'Grade' => 'required|numeric|decimal:0,2|min:0|max:100',
-            'Comment' => 'nullable|string'
+            'grade' => 'required|numeric|decimal:0,2|min:0|max:100',
+            'comment' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
@@ -388,14 +388,14 @@ class TaskController extends Controller
         }
 
         $grade = Grade::create([
-            'TenantId' => $tenantId,
-            'StudentId' => $studentId,
-            'SubjectId' => $subjectId,
-            'TaskId' => $id,
-            'Grade' => $request->input('Grade'),
-            'Comment' => $request->input('Comment'),
-            'IsActive' => true,
-            'Created' => now(),
+            'tenantId' => $tenantId,
+            'studentId' => $studentId,
+            'subjectId' => $subjectId,
+            'taskId' => $id,
+            'grade' => $request->input('grade'),
+            'comment' => $request->input('comment'),
+            'isActive' => true,
+            'created' => now(),
         ]);
 
         return response()->json(

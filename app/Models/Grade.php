@@ -9,26 +9,25 @@ class Grade extends Model
     protected $table = 'grades';
 
     protected $fillable = [
-        'Id',
-        'TenantId',
-        'StudentId',
-        'SubjectId',
-        'TaskId',
-        'Grade',
-        'Comment',
-        'IsActive',
-        'Created',
-        'Updated',
-        'Deleted'
+        'tenantId',
+        'studentId',
+        'subjectId',
+        'yaskId',
+        'grade',
+        'comment',
+        'isActive',
+        'created',
+        'updated',
+        'deleted'
     ];
 
-    protected $primaryKey = 'Id';
+    protected $primaryKey = 'id';
 
     public $timestamps = false;
 
     protected $casts = [
-        'Created' => 'datetime',
-        'Updated' => 'datetime',
-        'Deleted' => 'datetime'
+        'created' => 'datetime',
+        'updated' => 'datetime',
+        'deleted' => 'datetime'
     ];
 }

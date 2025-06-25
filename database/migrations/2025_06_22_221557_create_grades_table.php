@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('grades', function (Blueprint $table) {
-            $table->id('Id');
-            $table->uuid('TenantId');
-            $table->uuid('StudentId');
-            $table->uuid('SubjectId');
-            $table->integer('TaskId');
-            $table->decimal('Grade', 5, 2);
-            $table->string('Comment')->nullable();
-            $table->boolean('IsActive')->default(true);
-            $table->timestamp('Created')->useCurrent();
-            $table->timestamp('Updated')->nullable();
-            $table->timestamp('Deleted')->nullable();
+            $table->id();
+            $table->uuid('tenantId');
+            $table->uuid('studentId');
+            $table->uuid('subjectId');
+            $table->integer('taskId');
+            $table->decimal('grade', 5, 2);
+            $table->string('comment')->nullable();
+            $table->boolean('isActive')->default(true);
+            $table->timestamp('created')->useCurrent();
+            $table->timestamp('updated')->nullable();
+            $table->timestamp('deleted')->nullable();
         });
     }
 

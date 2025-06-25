@@ -8,26 +8,26 @@ class Task extends Model
 {
     protected $table = 'tasks';
 
-    protected $primaryKey = 'Id';
+    protected $primaryKey = 'id';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'Title',
-        'Description',
-        'DueDate',
-        'SubjectId',
-        'TenantId',
-        'IsActive',
-        'Created',
-        'Updated',
-        'Deleted'
+        'title',
+        'description',
+        'dueDate',
+        'subjectId',
+        'tenantId',
+        'isActive',
+        'created',
+        'updated',
+        'deleted'
     ];
 
     protected $casts = [
-        'DueDate' => 'datetime',
-        'Created' => 'datetime',
-        'Updated' => 'datetime',
-        'Deleted' => 'datetime',
+        'dueDate' => 'datetime',
+        'created' => 'datetime',
+        'updated' => 'datetime',
+        'deleted' => 'datetime',
     ];
 }

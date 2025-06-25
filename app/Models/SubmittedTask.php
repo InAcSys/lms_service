@@ -9,23 +9,23 @@ class SubmittedTask extends Model
     protected $table = 'submitted_tasks';
 
     protected $fillable = [
-        'Content',
-        'TaskId',
-        'StudentId',
-        'TenantId',
-        'IsActive',
-        'Created',
-        'Updated',
-        'Deleted'
+        'content',
+        'taskId',
+        'studentId',
+        'tenantId',
+        'isActive',
+        'created',
+        'updated',
+        'deleted'
     ];
 
     public $timestamps = false;
 
-    protected $primaryKey = 'Id';
+    protected $primaryKey = 'id';
 
     protected $casts = [
-        'Created' => 'datetime',
-        'Updated' => 'datetime',
-        'Deleted' => 'datetime'
+        'created' => 'datetime',
+        'updated' => 'datetime',
+        'deleted' => 'datetime'
     ];
 }

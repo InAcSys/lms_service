@@ -22,12 +22,12 @@ class SubjectStudentController extends Controller
             ], 400);
         }
 
-        $subjectStudents = SubjectStudent::where('TenantId', $tenantId)
-            ->where('SubjectId', $subjectId)
-            ->where('IsActive', true)
-            ->get('StudentId')
+        $subjectStudents = SubjectStudent::where('tenantId', $tenantId)
+            ->where('subjectId', $subjectId)
+            ->where('isActive', true)
+            ->get('studentId')
             ->map(function ($item) {
-                return $item->StudentId;
+                return $item->studentId;
             });
 
         return response()->json([
@@ -63,25 +63,25 @@ class SubjectStudentController extends Controller
 
         $studentIds = $request->input('studentIds');
         foreach ($studentIds as $studentId) {
-            $existing = SubjectStudent::where('TenantId', $tenantId)
-                ->where('SubjectId', $subjectId)
-                ->where('StudentId', $studentId)
+            $existing = SubjectStudent::where('tenantId', $tenantId)
+                ->where('subjectId', $subjectId)
+                ->where('studentId', $studentId)
                 ->first();
 
             if ($existing) {
-                if (!$existing->IsActive) {
-                    $existing->IsActive = true;
-                    $existing->Deleted = null;
+                if (!$existing->isActive) {
+                    $existing->isActive = true;
+                    $existing->deleted = null;
                     $existing->Updated = now();
                     $existing->save();
                 }
             } else {
                 SubjectStudent::create([
-                    'SubjectId' => $subjectId,
-                    'StudentId' => $studentId,
-                    'TenantId' => $tenantId,
-                    'IsActive' => true,
-                    'Created' => now(),
+                    'subjectId' => $subjectId,
+                    'studentId' => $studentId,
+                    'tenantId' => $tenantId,
+                    'isActive' => true,
+                    'created' => now(),
                 ]);
             }
         }
@@ -117,10 +117,10 @@ class SubjectStudentController extends Controller
         }
 
         $studentIds = $request->input('studentIds');
-        SubjectStudent::where('TenantId', $tenantId)
-            ->where('SubjectId', $subjectId)
-            ->whereIn('StudentId', $studentIds)
-            ->update(['IsActive' => false, 'Deleted' => now()]);
+        SubjectStudent::where('tenantId', $tenantId)
+            ->where('subjectId', $subjectId)
+            ->whereIn('studentId', $studentIds)
+            ->update(['isActive' => false, 'deleted' => now()]);
 
         return response()->json([
             'message' => 'Students revoked successfully.',
@@ -140,10 +140,10 @@ class SubjectStudentController extends Controller
             ], 400);
         }
 
-        $subjects = SubjectStudent::where('TenantId', $tenantId)
-            ->where('StudentId', $studentId)
-            ->where('IsActive', true)
-            ->get(['SubjectId']);
+        $subjects = SubjectStudent::where('tenantId', $tenantId)
+            ->where('studentId', $studentId)
+            ->where('isActive', true)
+            ->get(['subjectId']);
 
         return response()->json([
             'data' => $subjects,
