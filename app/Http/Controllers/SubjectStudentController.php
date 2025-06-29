@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SubjectStudent;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class SubjectStudentController extends Controller
 {
@@ -37,9 +38,8 @@ class SubjectStudentController extends Controller
         ], 200);
     }
 
-    public function enrollStudents(
-        Request $request
-    ) {
+    public function enrollStudents(Request $request)
+    {
         $tenantId = $request->query('tenantId');
         $subjectId = $request->query('subjectId');
 
@@ -62,39 +62,32 @@ class SubjectStudentController extends Controller
         }
 
         $studentIds = $request->input('studentIds');
+
         foreach ($studentIds as $studentId) {
-            $existing = SubjectStudent::where('tenantId', $tenantId)
+            $affected = SubjectStudent::where('tenantId', $tenantId)
                 ->where('subjectId', $subjectId)
                 ->where('studentId', $studentId)
-                ->first();
+                ->update(['isActive' => true]);
 
-            if ($existing) {
-                if (!$existing->isActive) {
-                    $existing->isActive = true;
-                    $existing->deleted = null;
-                    $existing->Updated = now();
-                    $existing->save();
-                }
-            } else {
+            if ($affected === 0) {
+                // No existía, crear nueva relación
                 SubjectStudent::create([
+                    'tenantId' => $tenantId,
                     'subjectId' => $subjectId,
                     'studentId' => $studentId,
-                    'tenantId' => $tenantId,
-                    'isActive' => true,
-                    'created' => now(),
+                    'isActive' => true
                 ]);
             }
         }
 
         return response()->json([
-            'message' => 'Students enrolled successfully.',
-            'status' => 201
-        ], 201);
+            'message' => 'Students enrolled or reactivated successfully.',
+            'status' => 200
+        ], 200);
     }
 
-    public function unenrollStudents(
-        Request $request
-    ) {
+    public function unenrollStudents(Request $request)
+    {
         $tenantId = $request->query('tenantId');
         $subjectId = $request->query('subjectId');
 
@@ -117,10 +110,19 @@ class SubjectStudentController extends Controller
         }
 
         $studentIds = $request->input('studentIds');
-        SubjectStudent::where('tenantId', $tenantId)
-            ->where('subjectId', $subjectId)
-            ->whereIn('studentId', $studentIds)
-            ->update(['isActive' => false, 'deleted' => now()]);
+
+        foreach ($studentIds as $studentId) {
+            SubjectStudent::where('tenantId', $tenantId)
+                ->where('subjectId', $subjectId)
+                ->where('studentId', $studentId)
+                ->where('isActive', true)
+                ->update([
+                    'isActive' => false,
+                    'deleted' => now(),
+                    'updated' => now()
+                ]);
+        }
+
 
         return response()->json([
             'message' => 'Students revoked successfully.',

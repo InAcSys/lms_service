@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SubjectStudentController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 
 const TASK_ID_ROUTE = '/{id}';
@@ -29,4 +30,10 @@ Route::prefix('tasks')->group(function () {
         Route::get('/task/{id}', [TaskController::class, 'getStudentGradeByTask']);
         Route::post('/assign/{id}', [TaskController::class, 'assignGrade']);
     });
+});
+
+Route::prefix('announcement')->group(function () {
+    Route::get('/', [AnnouncementController::class, 'index']);
+    Route::get('/{id}', [AnnouncementController::class, 'show']);
+    Route::post('/{id}', [AnnouncementController::class, 'store']);
 });

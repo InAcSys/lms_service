@@ -30,6 +30,7 @@ class TaskController extends Controller
         $tasks = Task::where('tenantId', $tenantId)
             ->where('subjectId', $subjectId)
             ->where('isActive', true)
+            ->orderBy('dueDate', 'asc')
             ->get();
 
         return response()->json([

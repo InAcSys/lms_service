@@ -4,28 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SubjectStudent extends Model
+class Announcement extends Model
 {
-    protected $table = 'subject_students';
+    protected $table = 'announcements';
 
-    public $timestamps = false;
-
-    public $incrementing = false;
-    protected $primaryKey = null;
+    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'subjectId',
-        'studentId',
+        'title',
+        'description',
         'tenantId',
+        'authorId',
+        'subjectId',
         'isActive',
         'created',
         'updated',
-        'deleted',
+        'deleted'
     ];
+
+    public $timestamps = false;
 
     protected $casts = [
         'created' => 'datetime',
         'updated' => 'datetime',
-        'deleted' => 'datetime',
+        'deleted' => 'datetime'
     ];
 }
