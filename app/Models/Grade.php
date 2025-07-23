@@ -12,7 +12,7 @@ class Grade extends Model
         'tenantId',
         'studentId',
         'subjectId',
-        'yaskId',
+        'taskId',
         'grade',
         'comment',
         'isActive',

@@ -257,7 +257,7 @@ class TaskController extends Controller
             ], 404);
         }
 
-        $contents = $request->input('content', []);
+        $contents = $request->input('contents', []);
 
         if (!is_array($contents) || count($contents) > 10) {
             return response()->json([
@@ -266,7 +266,7 @@ class TaskController extends Controller
         }
 
         $submittedTask = SubmittedTask::create([
-            'content' => json_encode($contents),
+            'contents' => json_encode($contents),
             'taskId' => $id,
             'studentId' => $studentId,
             'tenantId' => $tenantId,

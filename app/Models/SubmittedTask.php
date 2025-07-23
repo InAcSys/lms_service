@@ -9,7 +9,7 @@ class SubmittedTask extends Model
     protected $table = 'submitted_tasks';
 
     protected $fillable = [
-        'content',
+        'contents',
         'taskId',
         'studentId',
         'tenantId',
@@ -22,6 +22,7 @@ class SubmittedTask extends Model
     public $timestamps = false;
 
     protected $primaryKey = 'id';
+    protected $keyType = 'uuid';
 
     protected $casts = [
         'created' => 'datetime',
