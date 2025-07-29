@@ -6,14 +6,19 @@ until nc -z "$DB_HOST" "$DB_PORT"; do
   sleep 2
 done
 
-if php artisan --quiet list | grep -q octane; then
-    echo "Laravel Octane ya está instalado."
-else
-    echo "Instalando Laravel Octane..."
-    composer require laravel/octane
-    php artisan octane:install --server="swoole" --no-interaction
-fi
+# 🔧 Composer install cuando ya hay red
+composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-dev || true
+
+# Skip Octane for now to test basic Laravel functionality
+# if php artisan --quiet list | grep -q octane; then
+#     echo "Laravel Octane ya está instalado."
+# else
+#     echo "Instalando Laravel Octane..."
+#     composer require laravel/octane
+#     php artisan octane:install --server="swoole" --no-interaction
+# fi
 
 php artisan migrate --force
 
-exec php artisan octane:start --server="swoole" --host="0.0.0.0"
+# Use regular Laravel dev server instead of Octane
+exec php artisan serve --host="0.0.0.0" --port="8000"

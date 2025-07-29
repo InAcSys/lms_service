@@ -265,18 +265,100 @@ class TaskController extends Controller
             ], 422);
         }
 
-        $submittedTask = SubmittedTask::create([
-            'contents' => json_encode($contents),
-            'taskId' => $id,
-            'studentId' => $studentId,
-            'tenantId' => $tenantId,
-            'isActive' => true,
-            'created' => now(),
-        ]);
+        $submittedTask = SubmittedTask::where('studentId', $studentId)
+            ->where('taskId', $id)
+            ->where('tenantId', $tenantId)
+            ->first();
+
+        if ($submittedTask) {
+            $submittedTask->update(['contents' => $contents]);
+        } else {
+            $submittedTask = SubmittedTask::create([
+                'contents' => $contents,
+                'taskId' => $id,
+                'studentId' => $studentId,
+                'tenantId' => $tenantId,
+                'isActive' => true,
+                'created' => now(),
+            ]);
+        }
 
         return response()->json([
             'message' => 'Task resolution sent successfully.',
             'data' => $submittedTask,
+            'status' => 200
+        ], 200);
+    }
+
+    public function getStatusSubmittedTasks(Request $request, $taskId)
+    {
+        $tenantId = $request->query('tenantId');
+        $studentId = $request->query('studentId');
+
+        if (!$tenantId || !$studentId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING_2
+            ], 400);
+        }
+
+        $task = Task::where('id', $taskId)
+            ->where('tenantId', $tenantId)
+            ->where('isActive', true)
+            ->first();
+
+        if (!$task) {
+            return response()->json([
+                'error' => self::TASK_NOT_FOUND_ERROR
+            ], 404);
+        }
+
+        $submittedTask = SubmittedTask::where('taskId', $taskId)
+            ->where('studentId', $studentId)
+            ->where('tenantId', $tenantId)
+            ->where('isActive', true)
+            ->first();
+
+        $status = "";
+
+        if (!$submittedTask) {
+            $status = "not-submitted";
+        }
+
+        if (!$submittedTask && $task->dueDate < now()) {
+            $status = "expired";
+        }
+
+        if ($submittedTask && $task->dueDate >= now()) {
+            $status = "submitted";
+        }
+
+        return response()->json([
+            'data' => $status,
+            'message' => 'Submitted task status retrieved successfully.',
+            'status' => 200
+        ], 200);
+    }
+
+    public function getSubmittedTaskByStudent(Request $request, $studentId)
+    {
+        $tenantId = $request->query('tenantId');
+        $taskId = $request->query('taskId');
+
+        if (!$tenantId || !$taskId) {
+            return response()->json([
+                'error' => self::QUERY_PARAMS_MISSING_2
+            ], 400);
+        }
+
+        $submittedTasks = SubmittedTask::where('tenantId', $tenantId)
+            ->where('studentId', $studentId)
+            ->where('taskId', $taskId)
+            ->where('isActive', true)
+            ->first();
+
+        return response()->json([
+            'data' => $submittedTasks,
+            'message' => 'Submitted tasks by student retrieved successfully.',
             'status' => 200
         ], 200);
     }

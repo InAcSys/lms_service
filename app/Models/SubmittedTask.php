@@ -22,9 +22,9 @@ class SubmittedTask extends Model
     public $timestamps = false;
 
     protected $primaryKey = 'id';
-    protected $keyType = 'uuid';
 
     protected $casts = [
+        'contents' => 'array',
         'created' => 'datetime',
         'updated' => 'datetime',
         'deleted' => 'datetime'

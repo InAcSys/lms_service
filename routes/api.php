@@ -24,6 +24,8 @@ Route::prefix('tasks')->group(function () {
         Route::get('/task/{id}', [TaskController::class, 'getSubmittedTask']);
         Route::get('/tasks/{id}', [TaskController::class, 'showSubmittedTasks']);
         Route::post(ENDPOINT_ID_ROUTE, [TaskController::class, 'submitResolution']);
+        Route::get('/status/{taskId}', [TaskController::class, 'getStatusSubmittedTasks']);
+        Route::get('/student/{studentId}', [TaskController::class, 'getSubmittedTaskByStudent']);
     });
     Route::prefix('grades')->group(function () {
         Route::get('/', [TaskController::class, 'getStudentGradesBySubject']);

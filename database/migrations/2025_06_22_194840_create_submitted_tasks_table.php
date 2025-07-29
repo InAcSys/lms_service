@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('submitted_tasks', function (Blueprint $table) {
             $table->id();
-            $table->string('content')->nullable();
+            $table->json('contents')->nullable();
             $table->integer('taskId');
             $table->uuid('studentId');
             $table->uuid('tenantId');

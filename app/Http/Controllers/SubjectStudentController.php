@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SubjectStudent;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 
 class SubjectStudentController extends Controller
 {
@@ -70,7 +69,6 @@ class SubjectStudentController extends Controller
                 ->update(['isActive' => true]);
 
             if ($affected === 0) {
-                // No existía, crear nueva relación
                 SubjectStudent::create([
                     'tenantId' => $tenantId,
                     'subjectId' => $subjectId,
@@ -145,7 +143,7 @@ class SubjectStudentController extends Controller
         $subjects = SubjectStudent::where('tenantId', $tenantId)
             ->where('studentId', $studentId)
             ->where('isActive', true)
-            ->get(['subjectId']);
+            ->pluck('subjectId');
 
         return response()->json([
             'data' => $subjects,

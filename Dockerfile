@@ -49,8 +49,6 @@ COPY --from=spiralscout/roadrunner:2.4.2 /usr/bin/rr /usr/bin/rr
 WORKDIR /app
 COPY . .
 
-RUN composer install
-RUN composer require spiral/roadrunner
 COPY .env .env
 RUN mkdir -p /app/storage/logs
 
@@ -59,4 +57,4 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 CMD ["/usr/local/bin/docker-entrypoint.sh"]
-EXPOSE 8000
+EXPOSE 8001
